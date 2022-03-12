@@ -1,0 +1,61 @@
+Queries for https://livedata.bibsys.no/snorql/  
+
+************************
+Query 1: Fetch all curated works (?qual=kat3), and information about them
+************************
+# Note: If all properties below are included, some limit MUST be used (e.g. LIMIT 1000)
+
+SELECT * WHERE {
+  ?realwork rdf:type <http://rdaregistry.info/Elements/c/C10001> .
+  FILTER NOT EXISTS {{?realwork bibsys:mergedInto ?withwork} UNION {?realwork bibsys:deleted "true"^^xsd:boolean}}.
+  ?realwork nbbibliop:P1003 "kat3"^^xsd:string .
+  ?realwork rdf:type ?entityType .
+  ?realwork rdawo:P10065 ?creator .
+  ?realwork rdaw:P10223 ?prefTitle .
+  OPTIONAL {?realwork rdaw:P10086 ?varTitle } .
+  OPTIONAL {?realwork nbbibliop:P1001 ?origTitle } .
+  OPTIONAL {?realwork rdaw:P10219 ?dateOfWork } .
+  OPTIONAL {?realwork rdaw:P10256 ?subj } .
+  ?realwork nbbibliop:P1000 ?workType .
+  ?realwork nbbibliop:P1003 ?qual .
+  OPTIONAL {?realwork rdawo:P10148 ?isDeriv } .
+  OPTIONAL {?realwork rdawo:P10190 ?isBasedOn } .
+  OPTIONAL {?realwork rdawo:P10156 ?isPrecBy } .
+  OPTIONAL {?realwork rdawo:P10170 ?isSuccBy } .
+  OPTIONAL {?realwork rdawo:P10019 ?containedIn } .
+  OPTIONAL {?realwork rdawo:P10147 ?containerOf } .
+  OPTIONAL {?realwork rdawo:P10228 ?hasAccomp } .
+}
+LIMIT 1000     
+
+***********************
+Query 2: Fetch all curated works by a certain creator, with their preferred title and work type(s) 
+***********************
+#Here examplified with Amalie Skram (authority:90060895)
+#Note: No agent names are included on livedata, only their ID on the form http://livedata.bibsys.no/authority/<autID>
+#      <autID> is their ID in the Authority file
+
+SELECT * WHERE {
+  ?realwork rdf:type <http://rdaregistry.info/Elements/c/C10001> .
+  FILTER NOT EXISTS {{?realwork bibsys:mergedInto ?withwork} UNION {?realwork bibsys:deleted "true"^^xsd:boolean}}.
+  ?realwork nbbibliop:P1003 "kat3"^^xsd:string . #Remove if uncurated works are also to be included
+  ?realwork rdawo:P10065 authority:90060895 .   #Amalie Skram
+  ?realwork rdaw:P10223 ?prefTitle .
+  ?realwork nbbibliop:P1000 ?workType .  
+#put <https://schema.nb.no/Bibliographic/Values/V1000> for ?worktype, to restrict search to language-based works
+  ?realwork nbbibliop:P1003 ?qual .
+}
+***********************
+Query 3: Fetch the creator, preferred title and manifestations/bibliographical records connected with a specific work
+***********************
+# Here examplified by work http://livedata.bibsys.no/work/27d3f31958b53b76d081e5601f547bdfa4068e04b172883b077a2d888b6f47ec 
+#  (Agnete by Amalie Skram)
+
+SELECT DISTINCT *
+WHERE {
+  {<http://livedata.bibsys.no/work/27d3f31958b53b76d081e5601f547bdfa4068e04b172883b077a2d888b6f47ec> rdawo:P10065 ?creator .
+   <http://livedata.bibsys.no/work/27d3f31958b53b76d081e5601f547bdfa4068e04b172883b077a2d888b6f47ec> rdaw:P10223 ?prefTitle }
+  UNION
+  { ?publ schema:exampleOfWork <http://livedata.bibsys.no/work/27d3f31958b53b76d081e5601f547bdfa4068e04b172883b077a2d888b6f47ec> }
+}
+ORDER BY ?publ
