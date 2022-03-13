@@ -42,7 +42,7 @@ def evaluate_corpus_norwegian(corpus=None, matrix=None, top_number=50):
             except ZeroDivisionError:
                 pass
         # sort the result and keep the best
-        res[x].sort(key= lambda x: x[1], reverse = True)
+        res[x].sort(key= lambda x: x[1], reverse = False)
         vals[x] = res[x][0]
         
     return vals
