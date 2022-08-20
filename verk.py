@@ -23,6 +23,15 @@ import dhlab.api.dhlab_api as dhapi
 
 ########### Exported functions ################################
 
+def get_urnsets_from_work_ids(work_ids):
+    """get a list of URNs (a set of corpora) from a list of workids"""
+    result = []
+    for work_id in work_ids:
+        u = urns_for_works(work_id)
+        if u != []:
+            result.append(u)
+    return result
+
 def urns_for_works(works_id):
     """Fra en verks-ID hent ut alle URNer
     param:
